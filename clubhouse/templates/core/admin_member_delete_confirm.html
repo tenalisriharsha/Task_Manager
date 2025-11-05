@@ -1,0 +1,16 @@
+<!-- File: clubhouse/templates/core/admin_member_delete_confirm.html -->
+{% extends "base.html" %}
+{% block content %}
+<h3>Delete Member — {{ user_obj.username }}</h3>
+<p style="max-width:720px; color:#555;">
+  Are you sure you want to permanently delete this member? This cannot be undone.
+</p>
+
+<form method="post">
+  {% csrf_token %}
+  <div style="display:flex; gap:.5rem; align-items:center;">
+    <button type="submit" style="background:#b00020; color:#fff;">Yes, delete user</button>
+    <a href="{% url 'core:members' %}">Cancel</a>
+  </div>
+</form>
+{% endblock %}

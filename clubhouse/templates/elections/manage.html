@@ -1,0 +1,14 @@
+<!-- File: templates/elections/manage.html -->
+{% extends "base.html" %}
+{% block content %}
+<h3>Manage Elections</h3>
+<p><a href="{% url 'elections:create' %}">Create Election</a></p>
+<ul>
+  {% for e in elections %}
+    <li>
+      {{ e.start_at }} → {{ e.end_at }}
+      <a href="{% url 'elections:close' e.id %}">Close & Finalize</a>
+    </li>
+  {% endfor %}
+</ul>
+{% endblock %}

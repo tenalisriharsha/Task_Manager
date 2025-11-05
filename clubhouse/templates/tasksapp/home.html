@@ -1,0 +1,51 @@
+<!-- File: clubhouse/templates/tasksapp/home.html -->
+{% extends "base.html" %}
+{% block content %}
+<div style="display:flex; justify-content:space-between; align-items:center; gap:1rem; flex-wrap:wrap;">
+  <h3>Home Board (Week {{ week_start }})</h3>
+  {% if is_leader %}<a href="{% url 'tasksapp:task_new' %}" class="contrast">+ New Task</a>{% endif %}
+</div>
+
+<div class="board-columns">
+  <div class="board-col">
+    <h5>Assigned</h5>
+    <div class="col-body" id="col-assigned">
+      {% for a in assigned %}
+        {% include "tasksapp/_card.html" with a=a %}
+      {% empty %}<p>No items.</p>{% endfor %}
+    </div>
+  </div>
+
+  <div class="board-col">
+    <h5>Submitted (Awaiting Approval)</h5>
+    <div class="col-body" id="col-submitted">
+      {% for a in submitted %}
+        {% include "tasksapp/_card.html" with a=a %}
+      {% empty %}<p>No items.</p>{% endfor %}
+    </div>
+  </div>
+
+  <div class="board-col">
+    <h5>Done</h5>
+    <div class="col-body" id="col-approved">
+      {% for a in approved %}
+        {% include "tasksapp/_card.html" with a=a %}
+      {% empty %}<p>No items.</p>{% endfor %}
+    </div>
+  </div>
+
+  <div class="board-col">
+    <h5>Incompleted Tasks</h5>
+    <div class="col-body" id="col-overdue">
+      {% for a in overdue %}
+        {% include "tasksapp/_card.html" with a=a %}
+      {% empty %}<p>No items.</p>{% endfor %}
+    </div>
+  </div>
+</div>
+
+<article>
+  <h4>Leaderboard — All Members</h4>
+  {% include "tasksapp/_leaderboard_all.html" %}
+</article>
+{% endblock %}

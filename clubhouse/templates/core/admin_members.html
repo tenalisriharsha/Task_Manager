@@ -1,0 +1,60 @@
+<!-- File: clubhouse/templates/core/admin_members.html -->
+{% extends "base.html" %}
+{% block content %}
+<h3>Members</h3>
+<form method="get" style="margin: .5rem 0 1rem; display:flex; gap:.5rem; align-items:center;">
+  <input type="text" name="q" value="{{ q }}" placeholder="Search username…" />
+  <button type="submit">Search</button>
+  <a href="{% url 'core:members' %}">Clear</a>
+</form>
+
+<p><strong>Total:</strong> {{ total }} &nbsp;|&nbsp; <strong>Approved:</strong> {{ approved }} &nbsp;|&nbsp; <strong>Pending:</strong> {{ pending }}</p>
+
+<div style="overflow-x:auto;">
+  <table style="width:100%; border-collapse: collapse; margin-top: .75rem; min-width:720px;">
+    <thead>
+      <tr style="border-bottom: 1px solid #eee;">
+        <th style="text-align:left; padding:.4rem;">Username</th>
+        <th style="text-align:left; padding:.4rem;">Display Name</th>
+        <th style="text-align:left; padding:.4rem;">Approved</th>
+        <th style="text-align:left; padding:.4rem;">Active</th>
+        <th style="text-align:left; padding:.4rem;">Points</th>
+        <th style="text-align:left; padding:.4rem;">Stars</th>
+        <th style="text-align:left; padding:.4rem;">Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for u in members %}
+        <tr style="border-bottom: 1px solid #f2f2f2;">
+          <td style="padding:.4rem; white-space:nowrap;">
+            {{ u.username }}
+            {% if SITE and u.id == SITE.current_leader_id %}
+              <span style="margin-left:.35rem; font-size:.75rem; padding:.1rem .35rem; border-radius:.5rem; background:#eef7ff; border:1px solid #d6ecff;">Leader</span>
+            {% endif %}
+            {% if u.is_superuser %}
+              <span style="margin-left:.35rem; font-size:.75rem; padding:.1rem .35rem; border-radius:.5rem; background:#fff7e6; border:1px solid #ffe8b3;">Admin</span>
+            {% endif %}
+          </td>
+          <td style="padding:.4rem;">{{ u.profile.display_name|default:"—" }}</td>
+          <td style="padding:.4rem;">{{ u.profile.is_approved|yesno:"Yes,No" }}</td>
+          <td style="padding:.4rem;">{{ u.is_active|yesno:"Yes,No" }}</td>
+          <td style="padding:.4rem;">{{ u.profile.points_total }}</td>
+          <td style="padding:.4rem;">{{ u.profile.stars_total }}</td>
+          <td style="padding:.4rem; white-space:nowrap;">
+            <a href="{% url 'core:member_edit' u.id %}">Edit</a> |
+            <a href="{% url 'core:member_password' u.id %}">Password</a> |
+            {% if u.profile.is_approved %}
+              <a href="{% url 'accounts:deny_user' u.id %}">Unapprove</a> |
+            {% else %}
+              <a href="{% url 'accounts:approve_user' u.id %}">Approve</a> |
+            {% endif %}
+            <a href="{% url 'core:member_delete' u.id %}">Delete</a>
+          </td>
+        </tr>
+      {% empty %}
+        <tr><td colspan="7" style="padding:.6rem;">No members found.</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

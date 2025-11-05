@@ -1,0 +1,62 @@
+<!-- File: clubhouse/templates/tasksapp/history.html -->
+{% extends "base.html" %}
+{% block content %}
+<article>
+  <h3>Tasks History</h3>
+  <p class="muted">All assignments — assigned, submitted, done, and incomplete — with who did and approved them.</p>
+
+  <div class="history-scroll">
+    <table>
+      <thead>
+        <tr>
+          <th>Task</th>
+          <th>Assignee</th>
+          <th>Status</th>
+          <th>Approved By</th>
+          <th>Assigned At</th>
+          <th>Submitted At</th>
+          <th>Approved At</th>
+          <th>Due At</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for a in page_obj.object_list %}
+          <tr>
+            <td>{{ a.task.title }}</td>
+            <td>{{ a.assignee.username }}</td>
+            <td>
+              {% if a.display_status == 'Done' %}
+                <span class="badge" style="background:#e6ffec;">Done</span>
+              {% elif a.display_status == 'Submitted' %}
+                <span class="badge" style="background:#e9f3ff;">Submitted</span>
+              {% elif a.display_status == 'Incomplete' %}
+                <span class="badge" style="background:#ffe9e9;">Incomplete</span>
+              {% else %}
+                <span class="badge" style="background:#f3f4f6;">Assigned</span>
+              {% endif %}
+            </td>
+            <td>{% if a.approved_by %}{{ a.approved_by.username }}{% else %}—{% endif %}</td>
+            <td>{{ a.created_at|date:"Y-m-d H:i" }}</td>
+            <td>{% if a.submitted_at %}{{ a.submitted_at|date:"Y-m-d H:i" }}{% else %}—{% endif %}</td>
+            <td>{% if a.approved_at %}{{ a.approved_at|date:"Y-m-d H:i" }}{% else %}—{% endif %}</td>
+            <td>{% if a.due_at %}{{ a.due_at|date:"Y-m-d H:i" }}{% else %}—{% endif %}</td>
+          </tr>
+        {% empty %}
+          <tr><td colspan="8">No history yet.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+  <div style="display:flex; gap:1rem; align-items:center; justify-content:center; margin-top:1rem;">
+    {% if page_obj.has_previous %}
+      <a class="secondary" href="?page={{ page_obj.previous_page_number }}">&laquo; Prev</a>
+    {% endif %}
+    <small>Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</small>
+    {% if page_obj.has_next %}
+      <a class="secondary" href="?page={{ page_obj.next_page_number }}">Next &raquo;</a>
+    {% endif %}
+  </div>
+</article>
+{% endblock %}
+

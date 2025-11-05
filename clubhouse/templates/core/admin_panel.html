@@ -1,0 +1,37 @@
+<!-- File: clubhouse/templates/core/admin_panel.html -->
+{% extends "base.html" %}
+{% block content %}
+<h3>Admin Panel</h3>
+<article>
+  <h4>Join Code</h4>
+  <p><strong>{{ SITE.join_code|default:"(not set)" }}</strong></p>
+  <a class="contrast" href="{% url 'core:rotate_join_code' %}">Rotate Join Code</a>
+</article>
+
+<article>
+  <h4>Pending Users</h4>
+  {% for p in pending_profiles %}
+    <div class="card">
+      <strong>{{ p.user.username }}</strong> - {{ p.user.email }}
+      <div>
+        <a href="{% url 'accounts:approve_user' p.user.id %}">Approve</a> |
+        <a href="{% url 'accounts:deny_user' p.user.id %}">Deny</a> |
+        <a href="{% url 'core:set_first_leader' p.user.id %}">Set as Leader</a>
+      </div>
+    </div>
+  {% empty %}
+    <p>No pending users.</p>
+  {% endfor %}
+</article>
+
+<article>
+  <h4>Members</h4>
+  <p>View counts, edit members, reset passwords, or delete accounts.</p>
+  <p><a href="{% url 'core:members' %}">Open Members</a></p>
+</article>
+
+<article>
+  <h4>Recent Elections</h4>
+  <a href="{% url 'elections:manage' %}">Manage elections</a>
+</article>
+{% endblock %}

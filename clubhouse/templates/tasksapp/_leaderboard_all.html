@@ -1,0 +1,30 @@
+<!-- File: clubhouse/templates/tasksapp/_leaderboard_all.html -->
+<div class="leaderboard-scroll">
+  <table>
+    <thead>
+      <tr>
+        <th>Member</th>
+        <th>Total Points</th>
+        <th>Last Task</th>
+        <th>Last Points</th>
+        <th>When</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for row in leaderboard_all %}
+        <tr>
+          <td>{{ row.user.username }}</td>
+          <td style="text-align:right;">{{ row.points_total }}</td>
+          <td>{{ row.last_task_title|default:"—" }}</td>
+          <td style="text-align:right;">{{ row.last_points|default:0 }}</td>
+          <td>
+            {% if row.last_when %}{{ row.last_when|date:"Y-m-d H:i" }}{% else %}—{% endif %}
+            {% if row.last_status %}<small>{{ row.last_status }}</small>{% endif %}
+          </td>
+        </tr>
+      {% empty %}
+        <tr><td colspan="5">No members yet.</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>

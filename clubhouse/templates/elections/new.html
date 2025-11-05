@@ -1,0 +1,132 @@
+<!-- File: clubhouse/templates/elections/new.html -->
+{% extends "base.html" %}
+
+{% block content %}
+<h2 style="margin-bottom:.75rem;">Create New Election</h2>
+
+<form method="post" novalidate style="max-width:560px;">
+  {% csrf_token %}
+
+  {% if form.non_field_errors %}
+    <div class="flash" data-level="error" style="margin-bottom:.75rem;">
+      {{ form.non_field_errors }}
+    </div>
+  {% endif %}
+
+  <p>
+    <label for="{{ form.start_at.id_for_label }}"><strong>Start at</strong></label><br>
+    {{ form.start_at }}
+    {% if form.start_at.errors %}
+      <br><small style="color:#b00020;">{{ form.start_at.errors|striptags }}</small>
+    {% endif %}
+  </p>
+
+  <p>
+    <label for="{{ form.end_at.id_for_label }}"><strong>End at</strong></label><br>
+    {{ form.end_at }}
+    {% if form.end_at.errors %}
+      <br><small style="color:#b00020;">{{ form.end_at.errors|striptags }}</small>
+    {% endif %}
+  </p>
+
+  <p id="durationHint" style="opacity:.85; margin-top:.25rem;"></p>
+
+  <button type="submit" class="btn btn-primary" style="margin-top:.5rem;">Create election</button>
+  <a href="{% url 'elections:manage' %}" style="margin-left:.5rem;">Cancel</a>
+
+  <p style="opacity:.7; font-size:.9rem; margin-top:.75rem;">
+    Tip: Times use your local device time. The server will convert them to your site’s timezone.
+  </p>
+</form>
+
+<script>
+(function(){
+  const start = document.querySelector('input[name="start_at"]');
+  const end   = document.querySelector('input[name="end_at"]');
+  const hint  = document.getElementById('durationHint');
+
+  if(!start || !end) return;
+
+  // Convert a Date to yyyy-MM-ddTHH:mm (for datetime-local)
+  const pad = n => (n<10?'0':'') + n;
+  function toLocalValue(d){
+    return d.getFullYear() + '-' + pad(d.getMonth()+1) + '-' + pad(d.getDate())
+           + 'T' + pad(d.getHours()) + ':' + pad(d.getMinutes());
+  }
+
+  // If empty (e.g., first visit), default start=now (rounded to minute), end=start+1 day
+  if(!start.value){
+    const now = new Date();
+    now.setSeconds(0,0);
+    start.value = toLocalValue(now);
+  }
+  if(!end.value){
+    const s = new Date(start.value);
+    if(!isNaN(s)){
+      const plus1d = new Date(s.getTime() + 24*60*60*1000);
+      end.value = toLocalValue(plus1d);
+    }
+  }
+
+  // Keep end >= start and show duration
+  function sync(){
+    if(!start.value) return;
+    end.min = start.value;
+
+    const s = new Date(start.value);
+    const e = new Date(end.value);
+    if(isNaN(s) || isNaN(e)){
+      hint.textContent = '';
+      return;
+    }
+
+    // If end is before start, push end forward to start + 1 hour
+    if(e <= s){
+      const fixed = new Date(s.getTime() + 60*60*1000);
+      end.value = toLocalValue(fixed);
+    }
+
+    // Recompute after potential adjustment
+    const e2 = new Date(end.value);
+    const ms = e2 - s;
+    const mins = Math.round(ms / 60000);
+    const hrs  = Math.floor(mins / 60);
+    const remM = mins % 60;
+    const days = Math.floor(hrs / 24);
+    const remH = hrs % 24;
+
+    let txt = 'Duration: ';
+    if(days > 0) {
+      txt += `${days} day${days>1?'s':''}`;
+      if(remH>0) txt += ` ${remH} h`;
+      if(remM>0 && days===0) txt += ` ${remM} min`;
+    } else if(hrs > 0) {
+      txt += `${hrs} hour${hrs>1?'s':''}`;
+      if(remM>0) txt += ` ${remM} min`;
+    } else {
+      txt += `${remM} min`;
+    }
+    hint.textContent = txt;
+  }
+
+  start.addEventListener('change', sync);
+  end.addEventListener('change', sync);
+  sync();
+
+  // Client-side guard: prevent submit if end <= start (server also validates)
+  const form = start.closest('form');
+  if(form){
+    form.addEventListener('submit', function(ev){
+      const s = new Date(start.value);
+      const e = new Date(end.value);
+      if(isNaN(s) || isNaN(e) || e <= s){
+        ev.preventDefault();
+        hint.textContent = 'Please ensure End is after Start.';
+        hint.style.color = '#b00020';
+        end.focus();
+      }
+    });
+  }
+})();
+</script>
+{% endblock %}

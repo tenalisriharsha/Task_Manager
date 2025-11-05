@@ -1,0 +1,29 @@
+<!-- File: clubhouse/templates/core/admin_member_edit.html -->
+{% extends "base.html" %}
+{% block content %}
+<h3>Edit Member — {{ user_obj.username }}</h3>
+
+<form method="post" style="max-width: 720px;">
+  {% csrf_token %}
+
+  <fieldset style="border:1px solid #eee; padding:1rem; border-radius:.5rem; margin-bottom:1rem;">
+    <legend style="padding:0 .5rem; font-weight:600;">User</legend>
+    {{ uform.non_field_errors }}
+    {{ uform.as_p }}
+  </fieldset>
+
+  <fieldset style="border:1px solid #eee; padding:1rem; border-radius:.5rem; margin-bottom:1rem;">
+    <legend style="padding:0 .5rem; font-weight:600;">Profile</legend>
+    {{ pform.non_field_errors }}
+    {{ pform.as_p }}
+  </fieldset>
+
+  <div style="display:flex; gap:.5rem; align-items:center;">
+    <button type="submit">Save changes</button>
+    <a href="{% url 'core:members' %}">Cancel</a>
+    {% if SITE.current_leader_id and user_obj.id == SITE.current_leader_id %}
+      <span style="margin-left:auto; font-size:.9rem; background:#eef; padding:.2rem .5rem; border-radius:.4rem;">Current Leader</span>
+    {% endif %}
+  </div>
+</form>
+{% endblock %}

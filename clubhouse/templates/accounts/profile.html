@@ -1,0 +1,10 @@
+<!-- File: templates/accounts/profile.html -->
+{% extends "base.html" %}
+{% block content %}
+<h3>My Profile</h3>
+<form method="post" enctype="multipart/form-data">{% csrf_token %}
+  {{ form.as_p }}
+  <button type="submit">Save</button>
+</form>
+<p>Total Points: {{ request.user.profile.points_total }} | Total Stars: {{ request.user.profile.stars_total }}</p>
+{% endblock %}

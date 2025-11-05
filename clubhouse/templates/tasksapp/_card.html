@@ -1,0 +1,46 @@
+<!-- File: templates/tasksapp/_card.html -->
+{% now "U" as now_ts %}
+{% with due_ts=a.task.due_at|date:'U' %}
+<div class="card" id="a-{{ a.id }}"{% if due_ts < now_ts %} class="expired"{% endif %}>
+  <div style="display:flex; justify-content:space-between; align-items:center; gap:.75rem;">
+    <strong>{{ a.task.title }}</strong>
+    <span class="countdown" data-countdown="{{ a.task.due_at|date:'c' }}" style="font-size:.85rem; opacity:.85;"></span>
+  </div>
+
+  <p style="margin:.25rem 0 .5rem 0; opacity:.85;"><small>For: {{ a.assignee.username }} | Due {{ a.task.due_at }}</small></p>
+  <p style="margin:.25rem 0 .5rem 0;">{{ a.task.description }}</p>
+
+  <p style="margin:.25rem 0 .75rem 0;">
+    Status: <strong>{{ a.get_status_display }}</strong>
+    {% if a.stars_awarded %} | ⭐ {{ a.stars_awarded }}{% endif %}
+    {% if a.points_awarded %} | Points: {{ a.points_awarded }}{% endif %}
+  </p>
+
+  <div style="display:flex; gap:.5rem; flex-wrap:wrap;">
+    {% if a.status == 'ASSIGNED' and a.assignee_id == request.user.id %}
+      <button
+        class="btn-complete"
+        hx-post="{% url 'tasksapp:assignment_submit' a.id %}"
+        hx-target="#a-{{ a.id }}"
+        hx-swap="outerHTML"
+        {% if due_ts < now_ts %}disabled{% endif %}
+      >Mark Complete</button>
+    {% endif %}
+
+    {% if is_leader %}
+      {% if a.status != 'APPROVED' %}
+        <button
+          hx-post="{% url 'tasksapp:assignment_approve' a.id %}"
+          hx-target="#a-{{ a.id }}"
+          hx-swap="outerHTML"
+        >Approve</button>
+      {% endif %}
+      <button
+        hx-post="{% url 'tasksapp:assignment_star' a.id %}"
+        hx-target="#a-{{ a.id }}"
+        hx-swap="outerHTML"
+      >⭐ Star</button>
+    {% endif %}
+  </div>
+</div>
+{% endwith %}

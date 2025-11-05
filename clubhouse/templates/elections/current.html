@@ -1,0 +1,14 @@
+<!-- File: templates/elections/current.html -->
+{% extends "base.html" %}
+{% block content %}
+<h3>Current Election</h3>
+{% if election %}
+  <p>Open: {{ election.start_at }} → {{ election.end_at }}</p>
+  <form method="post" action="{% url 'elections:vote' election.id %}">{% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit">Cast / Update Vote</button>
+  </form>
+{% else %}
+  <p>No open election now.</p>
+{% endif %}
+{% endblock %}
